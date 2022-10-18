@@ -9,6 +9,15 @@ pub struct Commit {
     message: String
 }
 
+impl Repository {
+    pub fn new(name: String) -> Repository
+    {
+        Repository {
+            name,
+            history: vec![]
+        }
+    }
+}
 impl Commit {
     pub fn new(message: String) -> Commit
     {
@@ -25,6 +34,10 @@ pub fn commit(repository: &mut Repository, message: String) {
     let commit: Commit = Commit::new(message);
 
     repository.history.push(commit);
+}
+
+pub fn init(name: String) {
+    let repository = Repository::new(name);
 }
 
 #[cfg(test)]
