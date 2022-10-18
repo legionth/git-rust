@@ -21,8 +21,30 @@ impl Commit {
     }
 }
 
-pub fn commit(mut repository: Repository, message: String) {
+pub fn commit(repository: &mut Repository, message: String) {
     let commit: Commit = Commit::new(message);
 
     repository.history.push(commit);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn one_result() {
+        let history = Vec::new();
+        let mut repository = Repository {
+            name: "new-project".to_string(),
+            history
+        };
+
+        let old_length = repository.history.len();
+
+        commit(&mut repository, "new commit".to_string());
+        let new_length = repository.history.len();
+
+        assert_eq!(old_length, 0);
+        assert_eq!(new_length, 1);
+    }
 }
