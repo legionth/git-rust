@@ -1,3 +1,4 @@
+use std::{fs, io};
 
 pub struct Repository {
     name: String,
@@ -36,8 +37,12 @@ pub fn commit(repository: &mut Repository, message: String) {
     repository.history.push(commit);
 }
 
-pub fn init(name: String) {
-    let repository = Repository::new(name);
+pub fn init() -> std::io::Result<()> {
+    std::fs::create_dir(".gitrust")
+}
+
+fn in_repository(repository: Repository) -> bool {
+    std::path::Path::new(".gitrust").exists()
 }
 
 #[cfg(test)]
