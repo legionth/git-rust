@@ -1,6 +1,8 @@
 use std::{fs, io};
 use std::fs::OpenOptions;
 use std::io::Write;
+use std::fs::metadata;
+use chrono::format::Item::Error;
 
 pub struct Repository {
     name: String,
@@ -39,25 +41,31 @@ pub fn commit(repository: &mut Repository, message: String) {
     repository.history.push(commit);
 }
 
-pub fn init() -> std::io::Result<()> {
+pub fn init() -> io::Result<()> {
     std::fs::create_dir(".gitrust")
 }
 
-pub fn add(path: String) -> std::io::Result<()> {
-    let current_time = chrono::offset::Local::now();
+pub fn add(path: String) -> io::Result<()> {
+    let meta_data = metadata(&*path).unwrap();
 
-    let mut content: String = String::from(current_time.to_string());
-    content.push_str(&*" ".to_string());
-    content.push_str(&*path);
-    content.push_str(&*"\n".to_string());
+    if meta_data.is_file() {
+        let current_time = chrono::offset::Local::now();
 
-    let mut file = OpenOptions::new()
-        .write(true)
-        .append(true)
-        .open(".gitrust/index")
-        .unwrap();
+        let mut content: String = String::from(current_time.to_string());
+        content.push_str(&*" ".to_string());
+        content.push_str(&*path);
+        content.push_str(&*"\n".to_string());
 
-    file.write_all(content.as_ref())
+        let mut file = OpenOptions::new()
+            .write(true)
+            .append(true)
+            .open(".gitrust/index")
+            .unwrap();
+
+        return file.write_all(content.as_ref());
+    }
+
+    return Ok(());
 }
 
 fn in_repository(repository: Repository) -> bool {
