@@ -1,4 +1,6 @@
 use std::{fs, io};
+use std::fs::OpenOptions;
+use std::io::Write;
 
 pub struct Repository {
     name: String,
@@ -39,6 +41,23 @@ pub fn commit(repository: &mut Repository, message: String) {
 
 pub fn init() -> std::io::Result<()> {
     std::fs::create_dir(".gitrust")
+}
+
+pub fn add(path: String) -> std::io::Result<()> {
+    let current_time = chrono::offset::Local::now();
+
+    let mut content: String = String::from(current_time.to_string());
+    content.push_str(&*" ".to_string());
+    content.push_str(&*path);
+    content.push_str(&*"\n".to_string());
+
+    let mut file = OpenOptions::new()
+        .write(true)
+        .append(true)
+        .open(".gitrust/index")
+        .unwrap();
+
+    file.write_all(content.as_ref())
 }
 
 fn in_repository(repository: Repository) -> bool {
