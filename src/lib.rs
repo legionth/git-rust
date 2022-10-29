@@ -64,6 +64,15 @@ pub fn add(path: String) -> io::Result<()> {
 
         return file.write_all(content.as_ref());
     }
+    else if meta_data.is_dir() {
+        let paths = fs::read_dir(path).unwrap();
+        for sub_path in paths {
+            let entry = sub_path.unwrap();
+            let entry_path = entry.path();
+            let path_as_string = entry_path.to_str().unwrap();
+            add(path_as_string.to_string()).unwrap();
+        }
+    }
 
     return Ok(());
 }
