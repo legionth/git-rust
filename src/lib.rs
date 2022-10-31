@@ -1,6 +1,6 @@
 use std::{fs, io};
-use std::fs::OpenOptions;
-use std::io::Write;
+use std::fs::{File, OpenOptions};
+use std::io::{BufRead, BufReader, Write};
 use std::fs::metadata;
 use chrono::format::Item::Error;
 
@@ -35,10 +35,15 @@ impl Commit {
     }
 }
 
-pub fn commit(repository: &mut Repository, message: String) {
-    let commit: Commit = Commit::new(message);
+pub fn commit(message: String) -> io::Result<()> {
+    let file = File::open(".gitrust/index").expect("Unable to open");
+    let buffered = BufReader::new(file);
 
-    repository.history.push(commit);
+    for line in buffered.lines() {
+        println!("{}", line?);
+    }
+
+    Ok(())
 }
 
 pub fn init() -> io::Result<()> {
