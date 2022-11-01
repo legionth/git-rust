@@ -2,7 +2,7 @@ use std::{fs, io};
 use std::fs::{File, OpenOptions};
 use std::io::{BufRead, BufReader, Write};
 use std::fs::metadata;
-use chrono::format::Item::Error;
+use sha2::{Sha256, Digest};
 
 pub struct Repository {
     name: String,
@@ -57,8 +57,18 @@ pub fn add(path: String) -> io::Result<()> {
         let current_time = chrono::offset::Local::now();
 
         let mut content: String = String::from(current_time.to_string());
+        let mut hasher = Sha256::new();
+
+        let file_content = fs::read_to_string(&*path)
+            .expect("Should have been able to read the file");
+
+        hasher.update(file_content);
+        let hash_result = format!("{:X}", hasher.finalize());;
+
         content.push_str(&*" ".to_string());
         content.push_str(&*path);
+        content.push_str(" ");
+        content.push_str(&*hash_result);
         content.push_str(&*"\n".to_string());
 
         let mut file = OpenOptions::new()
@@ -100,7 +110,7 @@ mod tests {
 
         let old_length = repository.history.len();
 
-        commit(&mut repository, "new commit".to_string());
+        commit( "new commit".to_string());
         let new_length = repository.history.len();
 
         assert_eq!(old_length, 0);
