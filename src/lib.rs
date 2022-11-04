@@ -5,6 +5,21 @@ use std::fs::metadata;
 use std::ops::Add;
 use sha2::{Sha256, Digest};
 
+pub fn branch(name: String, commit_hash: String) -> std::io::Result<()>
+{
+    let file_path = String::from(".gitrust/refs/");
+    let value = file_path.add(&*name);
+
+    File::create(&*value)?;
+
+    let mut file = OpenOptions::new()
+        .write(true)
+        .open(value)
+        .unwrap();
+
+
+    return file.write_all(commit_hash.as_ref());
+}
 
 pub fn commit(message: String) -> io::Result<()> {
     let file = File::open(".gitrust/index").expect("Unable to open");
@@ -18,7 +33,9 @@ pub fn commit(message: String) -> io::Result<()> {
 }
 
 pub fn init() -> io::Result<()> {
-    std::fs::create_dir(".gitrust")
+    fs::create_dir(".gitrust")?;
+    File::create(".gitrust/index")?;
+    fs::create_dir(".gitrust/refs")
 }
 
 pub fn add(path: String) -> io::Result<()> {
