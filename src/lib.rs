@@ -2,6 +2,7 @@ use std::{fs, io};
 use std::fs::{File, OpenOptions};
 use std::io::{BufRead, BufReader, Write};
 use std::fs::metadata;
+use std::ops::Add;
 use sha2::{Sha256, Digest};
 
 
@@ -60,10 +61,6 @@ pub fn add(path: String) -> io::Result<()> {
     }
 
     return Ok(());
-}
-
-fn in_repository(repository: Repository) -> bool {
-    std::path::Path::new(".gitrust").exists()
 }
 
 #[cfg(test)]
